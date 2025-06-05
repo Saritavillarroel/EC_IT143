@@ -136,3 +136,53 @@ WHERE
     TABLE_SCHEMA = 'Sales' AND 
     TABLE_NAME = 'SalesOrderHeader';
 
+
+
+    --4 Question for other student:
+-- Question: How many matches has each team played, whether they were the home or away team?
+-- A: Combine the home_team and away_team columns, and count how many times each team appears
+
+SELECT team_name, COUNT(*) AS Matches_Played
+FROM (
+    SELECT home_team AS team_name FROM dbo.rugby_results
+    UNION ALL
+    SELECT away_team AS team_name FROM dbo.rugby_results
+) AS CombinedTeams
+GROUP BY team_name;
+
+IF OBJECT_ID('dbo.Rugby_Matches_Played', 'V') IS NOT NULL
+    DROP VIEW dbo.Rugby_Matches_Played;
+GO
+
+
+--EC_IT143_W3.4_jw.sql
+--Q2: What is the list price of the most expensive product we sell?
+--A2: List products in decsending to find that largest price.
+
+SELECT pp.ProductID, p.Name, pp.ListPrice
+FROM Production.ProductListPriceHistory AS pp
+LEFT JOIN Production.Product AS p ON  pp.ProductID = p.ProductID
+ORDER BY pp.ListPrice DESC;
+
+--EC_IT143_W3.4_jw.sql
+-- Q1: What is the most common city are our bikes sold?
+-- A1: Making a query and making a join and adding up all the total of all the number of sales in each region.
+
+SET statistics time on 
+
+SELECT GETDATE() AS my_date;
+
+SELECT st.TerritoryID, st.Name, COUNT(st.TerritoryID) AS Territory_Count
+FROM Sales.SalesTerritory AS st
+LEFT JOIN Sales.SalesTerritoryHistory AS th ON st.TerritoryID = th.TerritoryID
+GROUP BY st.TerritoryID, st.Name
+ORDER BY Territory_Count DESC;
+
+----Roland Jens Barón
+--Q:   How many aircraft are there per role?
+--A: Use GROUP BY on the Role column and count the number of aircraft in each group.--
+
+SELECT Role, COUNT(*) AS Aircraft_Count
+FROM dbo.military_aircraft
+GROUP BY Role;
+
