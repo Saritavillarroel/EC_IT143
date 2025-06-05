@@ -1,0 +1,138 @@
+--Q1: Should the company produce an additional unit of a product or service?
+--- Q1: What is the production cost and list price of the products?
+
+SELECT 
+    p.Name AS ProductName,
+    p.StandardCost,
+    p.ListPrice,
+    (p.ListPrice - p.StandardCost) AS ProfitMargin
+FROM 
+    Production.Product p
+WHERE 
+    p.StandardCost > 0 AND p.ListPrice > 0;
+
+
+
+--Q2: Should the company spend more money on advertising?
+--Q2: What is the total sales by territory?
+
+SELECT 
+    st.Name AS Territory,
+    SUM(soh.SubTotal) AS TotalSales
+FROM 
+    Sales.SalesOrderHeader soh
+JOIN 
+    Sales.SalesTerritory st ON soh.TerritoryID = st.TerritoryID
+GROUP BY 
+    st.Name
+ORDER BY 
+    TotalSales DESC;
+
+
+
+--Q3: What are the main problems your company is facing?
+--Q3: What are the products with the highest return rates?
+
+SELECT 
+    p.Name AS ProductName,
+    COUNT(*) AS ReturnCount
+FROM 
+    Sales.SalesOrderDetail sod
+JOIN 
+    Production.Product p ON sod.ProductID = p.ProductID
+WHERE 
+    sod.SalesOrderID IN (
+        SELECT SalesOrderID
+FROM Sales.SalesOrderHeader 
+        WHERE Status = 4 -- Status 4 indicates returned orders
+    )
+GROUP BY 
+    p.Name
+ORDER BY 
+    ReturnCount DESC;
+
+
+--Q4: How have you been solving those problems so far?
+-- Q4: What corrective actions have been taken on the work orders?
+
+SELECT 
+    sr.Name AS ScrapReason,
+    COUNT(*) AS Occurrences
+FROM 
+    Production.WorkOrder wo
+JOIN 
+    Production.ScrapReason sr ON wo.ScrapReasonID = sr.ScrapReasonID
+GROUP BY 
+    sr.Name
+ORDER BY 
+    Occurrences DESC;
+
+
+
+--Q5: How does your software integrate with our current system?
+-- Q5: What are the relationships between the key tables of the system?
+
+
+SELECT 
+    fk.name AS ForeignKey,
+tp.name AS ParentTable,
+    cp.name AS ParentColumn,
+    tr.name AS ReferencedTable,
+    cr.name AS ReferencedColumn
+FROM 
+    sys.foreign_keys fk
+INNER JOIN 
+    sys.foreign_key_columns fkc ON fkc.constraint_object_id = fk.object_id
+INNER JOIN 
+    sys.tables tp ON fkc.parent_object_id = tp.object_id
+INNER JOIN 
+    sys.columns cp ON fkc.parent_object_id = cp.object_id AND fkc.parent_column_id = cp.column_id
+INNER JOIN 
+    sys.tables tr ON fkc.referenced_object_id = tr.object_id
+INNER JOIN 
+    sys.columns cr ON fkc.referenced_object_id = cr.object_id AND fkc.referenced_column_id = cr.column_id;
+
+
+
+--Q6: Can you offer customized solutions for our specific needs?
+--Q6: What customizations have been implemented in the system?
+
+SELECT 
+    ROUTINE_NAME, 
+    ROUTINE_TYPE
+FROM 
+    INFORMATION_SCHEMA.ROUTINES
+WHERE 
+    ROUTINE_TYPE = 'FUNCTION';
+
+
+
+
+--Q7: What tables exist in the database?
+-- Q7: What tables exist in the database?
+
+
+SELECT 
+    TABLE_SCHEMA, 
+    TABLE_NAME
+FROM 
+    INFORMATION_SCHEMA.TABLES
+WHERE 
+    TABLE_TYPE = 'BASE TABLE';
+
+
+
+
+
+--Q8: What columns does a specific table have?
+-- Q8: What columns does the Sales.SalesOrderHeader table have?
+
+SELECT 
+    COLUMN_NAME, 
+    DATA_TYPE
+FROM 
+    INFORMATION_SCHEMA.COLUMNS
+WHERE 
+    TABLE_SCHEMA = 'Sales' AND 
+    TABLE_NAME = 'SalesOrderHeader';
+
